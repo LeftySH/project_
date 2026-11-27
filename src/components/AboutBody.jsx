@@ -1,4 +1,5 @@
 import { useAge } from '../hooks.js';
+import ScrollArea from './ScrollArea.jsx';
 
 function Skill({ name, level }) {
   return (
@@ -16,6 +17,7 @@ function Skill({ name, level }) {
 export default function AboutBody() {
   const age = useAge();
   return (
+    <ScrollArea>
     <div className="about">
       <p className="about__name">
         LeftySH<span className="cursor" aria-hidden="true" />
@@ -39,5 +41,6 @@ export default function AboutBody() {
         <Skill name="HTML & CSS" level={3} />
       </div>
     </div>
+    </ScrollArea>
   );
 }

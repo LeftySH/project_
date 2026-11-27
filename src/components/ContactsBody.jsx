@@ -1,7 +1,9 @@
 import { EMAIL, TELEGRAM_URL } from '../data.js';
+import ScrollArea from './ScrollArea.jsx';
 
 export default function ContactsBody() {
   return (
+    <ScrollArea>
     <div className="contacts">
       {/* Telegram пока заглушка: если TELEGRAM_URL пустой, клик ничего не делает */}
       <a
@@ -14,5 +16,6 @@ export default function ContactsBody() {
       </a>
       <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
     </div>
+    </ScrollArea>
   );
 }

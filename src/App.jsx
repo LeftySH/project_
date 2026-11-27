@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Window from './components/Window.jsx';
 import DesktopIcon from './components/DesktopIcon.jsx';
 import AboutBody from './components/AboutBody.jsx';
@@ -271,6 +271,10 @@ export default function App() {
     if (!current.url) e.preventDefault();
   };
 
+  // на телефоне окна лежат в одной колонке, на десктопе — свободно по экрану
+  const Stack = isDesktop ? Fragment : 'div';
+  const stackProps = isDesktop ? {} : { className: 'stack' };
+
   return (
     <>
     <div className="crt-flash" aria-hidden="true" />
@@ -296,6 +300,7 @@ export default function App() {
         />
       ))}
 
+      <Stack {...stackProps}>
       {open.about && (
         <Window {...winProps('about')} title={WINDOWS.about.title}>
           <AboutBody />
@@ -334,6 +339,7 @@ export default function App() {
           <ViewerBody project={current} />
         </Window>
       )}
+      </Stack>
     </main>
     </>
   );
