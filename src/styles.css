@@ -23,7 +23,7 @@ body,
 }
 
 body {
-  background: var(--bg);
+  background: #000;
   color: var(--text);
   font-family: 'Roboto Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   font-size: 13px;
@@ -93,6 +93,7 @@ img {
 
 .icon {
   position: absolute;
+  z-index: 2;
   line-height: 0;
   touch-action: none;
   user-select: none;
@@ -138,7 +139,6 @@ img {
   border-image: linear-gradient(#d7d7d7, #787878) 1;
   background: var(--noise), var(--bg);
   background-size: 200px 200px, auto;
-  overflow: hidden;
 }
 
 .win__bar {
@@ -191,6 +191,7 @@ img {
   flex: 1;
   min-height: 0;
   margin-top: 3px;
+  overflow: hidden;
 }
 
 /* ---------- ABOUT ME ---------- */
@@ -465,5 +466,141 @@ img {
 @media (prefers-reduced-motion: reduce) {
   .cursor {
     animation: none;
+  }
+}
+
+/* ---------- виньетка ---------- */
+
+.desktop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.34), transparent 15%, transparent 85%, rgba(0, 0, 0, 0.34)),
+    radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.3) 100%);
+}
+
+.brand {
+  z-index: 1;
+}
+
+/* ---------- иконки в заголовке неактивного окна тоже приглушаются ---------- */
+
+.win.is-dim .win__tools {
+  opacity: 0.62;
+}
+
+/* ---------- изменение размера окон ---------- */
+
+.win__rs {
+  position: absolute;
+  z-index: 4;
+  touch-action: none;
+}
+
+.win__rs--n,
+.win__rs--s {
+  left: 12px;
+  right: 12px;
+  height: 7px;
+  cursor: ns-resize;
+}
+
+.win__rs--e,
+.win__rs--w {
+  top: 12px;
+  bottom: 12px;
+  width: 7px;
+  cursor: ew-resize;
+}
+
+/* ручки перекрывают рамку окна (2px) */
+.win__rs--n { top: -2px; }
+.win__rs--s { bottom: -2px; }
+.win__rs--e { right: -2px; }
+.win__rs--w { left: -2px; }
+
+.win__rs--ne,
+.win__rs--nw,
+.win__rs--se,
+.win__rs--sw {
+  width: 16px;
+  height: 16px;
+}
+
+.win__rs--ne { top: -2px; right: -2px; cursor: nesw-resize; }
+.win__rs--sw { bottom: -2px; left: -2px; cursor: nesw-resize; }
+.win__rs--nw { top: -2px; left: -2px; cursor: nwse-resize; }
+.win__rs--se { bottom: -2px; right: -2px; cursor: nwse-resize; }
+
+.win--viewer .win__rs--e,
+.win--viewer .win__rs--w {
+  top: 0;
+  bottom: 0;
+}
+
+/* ---------- включение как у старого телевизора ---------- */
+
+.desktop {
+  animation: crt-on 1.15s cubic-bezier(0.25, 0.7, 0.2, 1) backwards;
+}
+
+@keyframes crt-on {
+  0% {
+    transform: scale(0, 0.004);
+    filter: brightness(9) contrast(1.5);
+  }
+  20% {
+    transform: scale(1, 0.004);
+    filter: brightness(9) contrast(1.5);
+  }
+  42% {
+    transform: scale(1, 0.004);
+    filter: brightness(12);
+  }
+  70% {
+    transform: scale(1, 1.05);
+    filter: brightness(2.6);
+  }
+  84% {
+    transform: scale(1, 0.99);
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: scale(1, 1);
+    filter: brightness(1);
+  }
+}
+
+.crt-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.95) 0, rgba(190, 215, 255, 0.45) 28%, transparent 62%);
+  animation: crt-flash 1.15s ease-out both;
+}
+
+@keyframes crt-flash {
+  0%,
+  38% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktop {
+    animation: none;
+  }
+  .crt-flash {
+    display: none;
   }
 }

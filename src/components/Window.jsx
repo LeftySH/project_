@@ -9,6 +9,8 @@ export default function Window({
   onActivate,
   onClose,
   tools,
+  resizeDirs,
+  onResizeDown,
   children,
 }) {
   return (
@@ -23,6 +25,9 @@ export default function Window({
         </div>
       </header>
       <div className="win__body">{children}</div>
+      {resizeDirs?.map((d) => (
+        <span key={d} className={`win__rs win__rs--${d}`} onPointerDown={onResizeDown(d)} />
+      ))}
     </section>
   );
 }

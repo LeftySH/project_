@@ -33,6 +33,14 @@ const ICONS = {
   projects: { x: 289, y: 55, size: [115, 68], label: 'my projects.txt', off: projectsOff, on: projectsOn },
 };
 
+// минимальные размеры окон при изменении размера
+const MIN = {
+  about: { w: 300, h: 160 },
+  contacts: { w: 200, h: 70 },
+  projects: { w: 320, h: 200 },
+  viewer: { w: 340, h: 0 },
+};
+
 const DESKTOP_OPEN = { about: true, contacts: true, projects: true, viewer: true };
 const MOBILE_OPEN = { about: true, contacts: false, projects: false, viewer: false };
 const MOBILE_MQ = '(min-width: 768px)';
@@ -89,6 +97,11 @@ export default function App() {
 
   const [open, setOpen] = useState(() => (window.innerWidth >= 768 ? DESKTOP_OPEN : MOBILE_OPEN));
   const [pos, setPos] = useState(startPositions);
+  const [size, setSize] = useState(() =>
+    Object.fromEntries(Object.entries(WINDOWS).map(([id, d]) => [id, { w: d.w, h: d.h }])),
+  );
+  const sizeRef = useRef(size);
+  sizeRef.current = size;
   const [iconPos, setIconPos] = useState(startIconPositions);
   // порядок слоёв: последний элемент лежит сверху
   const [order, setOrder] = useState(['about', 'viewer', 'projects', 'contacts']);
@@ -119,7 +132,7 @@ export default function App() {
       setPos((p) => {
         const n = {};
         for (const id of Object.keys(p)) {
-          n[id] = { x: clamp(p[id].x, 100 - WINDOWS[id].w, vw - 100), y: clamp(p[id].y, 0, vh - 40) };
+          n[id] = { x: clamp(p[id].x, 100 - sizeRef.current[id].w, vw - 100), y: clamp(p[id].y, 0, vh - 40) };
         }
         return n;
       });
@@ -172,8 +185,35 @@ export default function App() {
       const vh = window.innerHeight;
       setPos((p) => ({
         ...p,
-        [id]: { x: clamp(ox + dx, 100 - WINDOWS[id].w, vw - 100), y: clamp(oy + dy, 0, vh - 40) },
+        [id]: { x: clamp(ox + dx, 100 - size[id].w, vw - 100), y: clamp(oy + dy, 0, vh - 40) },
       }));
+    });
+  };
+
+  const onResizeDown = (id, dir) => (e) => {
+    if (!isDesktop || e.button !== 0) return;
+    e.preventDefault();
+    const start = { ...pos[id], ...size[id] };
+    const min = MIN[id];
+    const fixedHeight = id === 'viewer'; // высота окна проекта считается от ширины
+    beginDrag(e, (dx, dy) => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      let { x, y, w, h } = start;
+      if (dir.includes('e')) w = start.w + dx;
+      if (dir.includes('w')) w = start.w - dx;
+      if (dir.includes('s')) h = start.h + dy;
+      if (dir.includes('n')) h = start.h - dy;
+      w = Math.min(Math.max(min.w, w), vw);
+      h = Math.min(Math.max(min.h, h), vh);
+      if (dir.includes('w')) x = start.x + start.w - w;
+      if (dir.includes('n')) y = start.y + start.h - h;
+      if (y < 0) {
+        h += y;
+        y = 0;
+      }
+      setSize((s) => ({ ...s, [id]: { w, h: fixedHeight ? s[id].h : h } }));
+      setPos((p) => ({ ...p, [id]: { x, y } }));
     });
   };
 
@@ -209,12 +249,14 @@ export default function App() {
     onActivate: () => focus(id),
     onClose: () => closeWin(id),
     onBarPointerDown: onBarPointerDown(id),
+    resizeDirs: isDesktop ? (id === 'viewer' ? ['e', 'w'] : ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw']) : null,
+    onResizeDown: (dir) => onResizeDown(id, dir),
     style: isDesktop
       ? {
           left: pos[id].x,
           top: pos[id].y,
-          width: WINDOWS[id].w,
-          height: id === 'viewer' ? undefined : WINDOWS[id].h,
+          width: size[id].w,
+          height: id === 'viewer' ? undefined : size[id].h,
           zIndex: 10 + order.indexOf(id),
         }
       : { zIndex: 10 + order.indexOf(id) },
@@ -230,6 +272,8 @@ export default function App() {
   };
 
   return (
+    <>
+    <div className="crt-flash" aria-hidden="true" />
     <main className="desktop" data-mode={isDesktop ? 'desktop' : 'mobile'} data-viewer={open.viewer ? 'on' : 'off'}>
       <div className="brand">
         <h1 className="brand__title">Project_</h1>
@@ -291,5 +335,6 @@ export default function App() {
         </Window>
       )}
     </main>
+    </>
   );
 }
