@@ -108,6 +108,7 @@ export default function App() {
   const [activeState, setActive] = useState('about');
   const [currentId, setCurrentId] = useState(projects[0].id);
   const suppressClick = useRef(false);
+  const [intro, setIntro] = useState(true);
 
   const current = projects.find((p) => p.id === currentId) || projects[0];
   const topOpen = [...order].reverse().find((id) => open[id]);
@@ -277,7 +278,18 @@ export default function App() {
 
   return (
     <>
-    <div className="crt-flash" aria-hidden="true" />
+    {intro && (
+      <div
+        className="tv"
+        aria-hidden="true"
+        onAnimationEnd={(e) => {
+          if (e.target === e.currentTarget) setIntro(false);
+        }}
+      >
+        <div className="tv__screen" />
+        <div className="tv__dot" />
+      </div>
+    )}
     <main className="desktop" data-mode={isDesktop ? 'desktop' : 'mobile'} data-viewer={open.viewer ? 'on' : 'off'}>
       <div className="brand">
         <h1 className="brand__title">Project_</h1>
