@@ -582,90 +582,78 @@ img {
   bottom: 0;
 }
 
-/* ---------- заставка поверх сайта: схлопывание экрана старого телевизора ---------- */
-/* Сам сайт не анимируется: сверху лежит чёрный слой, на нём белый экран
-   схлопывается в линию и точку, потом слой растворяется. Общая длительность — 1.5s. */
+/* ---------- заставка включения телевизора (поверх сайта) ---------- */
 
 .tv {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  overflow: hidden;
   background: #000;
   pointer-events: none;
-  animation: tv-bg 1.5s linear forwards;
 }
 
-.tv__screen {
+.tv canvas {
   position: absolute;
   inset: 0;
-  background: #f4f4f4;
-  transform-origin: 50% 50%;
-  animation: tv-screen 0.8s ease-in 0.12s both;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-.tv__dot {
+/* белый экран растворяется и открывает сайт */
+.tv.is-fading {
+  animation: tv-fade 0.6s ease-out forwards;
+}
+
+@keyframes tv-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+/* после включения: строки развёртки и пара мерцаний */
+.tv-after {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0 1px, transparent 1px 3px);
+  animation: tv-scan 1.3s ease-out forwards;
+}
+
+.tv-after::after {
+  content: '';
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 96px;
-  height: 36px;
-  margin: -18px 0 0 -48px;
-  border-radius: 50%;
+  inset: 0;
   background: #fff;
-  box-shadow:
-    0 0 36px 16px rgba(255, 255, 255, 0.75),
-    0 0 120px 48px rgba(255, 255, 255, 0.25);
-  animation: tv-dot 0.75s ease-out 0.36s both;
+  opacity: 0;
+  animation: tv-flicker 1.3s steps(1, end) forwards;
 }
 
-@keyframes tv-bg {
-  0%,
-  62% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes tv-screen {
+@keyframes tv-scan {
   0% {
-    transform: scale(1, 1);
-    opacity: 1;
-  }
-  40% {
-    transform: scale(1, 0.004);
-    opacity: 1;
-  }
-  62% {
-    transform: scale(1, 0.004);
     opacity: 1;
   }
   100% {
-    transform: scale(0, 0.004);
     opacity: 0;
   }
 }
 
-@keyframes tv-dot {
+@keyframes tv-flicker {
   0% {
-    opacity: 0;
-    transform: scale(1.3, 1);
+    opacity: 0.1;
   }
-  12% {
-    opacity: 1;
-    transform: scale(1, 1);
+  9% {
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.07;
+  }
+  22% {
+    opacity: 0;
   }
   100% {
     opacity: 0;
-    transform: scale(0.12);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tv {
-    display: none;
   }
 }
 

@@ -24,3 +24,8 @@ npm run build    # сборка в папку dist
 **Vercel:** залей папку на GitHub, на vercel.com выбери Add New → Project → импортируй репозиторий. Настройки определятся сами (Vite).
 
 **GitHub Pages:** `npm run build`, содержимое `dist` выложи в ветку gh-pages (или через GitHub Actions). Сборка уже использует относительные пути.
+
+
+git add -A
+git commit -m "update"
+git push
